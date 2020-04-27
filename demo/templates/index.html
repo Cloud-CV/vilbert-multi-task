@@ -1,0 +1,25 @@
+<!Doctype html>
+{% load static %}
+<html>
+
+<head>
+    {% block head %} {%include "head.html"%} {%endblock%}
+</head>
+
+<body>
+    {%block header%} {%include "header.html"%} {% endblock %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {% block header_content%} {%include "header_content.html"%} {%endblock%}
+            </div>
+        </div>
+        <div class="row">
+            {%block demo_images %} {%include "demo_images.html"%} {%endblock%}
+        </div> 
+        {%block terminal %}
+        {% include "terminal.html" %}{% endblock %} {% block result%}{%include "result.html"%}
+        {%endblock%} {% block credits %} {%include "credits.html"%} {%endblock%}
+</body>
+</html>

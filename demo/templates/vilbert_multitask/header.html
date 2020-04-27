@@ -1,0 +1,522 @@
+<script>
+    var sampleImagesList = []
+    function addImagesToSampleList(imageId, imagePath) {
+        $("#task-example").html("");
+        $("#task-example").hide();
+        $('#submit-images').val('Submit');
+        document.getElementById("fileupload").disabled = true;
+        $('#fileupload').fileupload('disable');
+        $("#question").prop("disabled", true);
+        $("#selected-task").prop("disabled", true);
+        document.getElementById('submit-button').disabled = true;
+        $("#ResultDiv").hide();
+        $("#task-description-data-div").hide();
+        $("#show-refer-expressions-task-result").hide();
+        $("#show-grad-cam-result").hide();
+        $("#question").val("");
+        $("#selected-task").val("");
+        $("#question").attr("placeholder", "Input Field").val("").focus().blur();
+        $("#question").removeClass("long-placeholder");
+        console.log(imageId, imagePath);
+        if (sampleImagesList.includes(imagePath)) {
+            var index = sampleImagesList.indexOf(imagePath);
+            sampleImagesList.splice(index, 1);
+            document.getElementById(imageId).style.border = "";
+            if (sampleImagesList.length == 0) {
+                console.log("I've enabled file upload");
+                document.getElementById("fileupload").disabled = false;
+                $('#fileupload').fileupload('enable');
+
+            }
+            if (sampleImagesList.length == 1) {
+                document.getElementById("selected-task").options[1].disabled = false;
+                document.getElementById("selected-task").options[2].disabled = false;
+                document.getElementById("selected-task").options[3].disabled = false;
+                document.getElementById("selected-task").options[4].disabled = false;
+                document.getElementById("selected-task").options[5].disabled = false;
+                document.getElementById("selected-task").options[6].disabled = false;
+                document.getElementById("selected-task").options[7].disabled = true;
+                document.getElementById("selected-task").options[8].disabled = true;
+            }
+        } else if (sampleImagesList.length < 4) {
+            sampleImagesList.push(imagePath);
+            document.getElementById(imageId).style.border = "3px solid red";
+            if (sampleImagesList.length == 1) {
+                document.getElementById("selected-task").options[8].disabled = true;
+                document.getElementById("selected-task").options[7].disabled = true;
+                document.getElementById("selected-task").options[1].disabled = false;
+                document.getElementById("selected-task").options[2].disabled = false;
+                document.getElementById("selected-task").options[3].disabled = false;
+                document.getElementById("selected-task").options[4].disabled = false;
+                document.getElementById("selected-task").options[5].disabled = false;
+                document.getElementById("selected-task").options[6].disabled = false;
+            } else if (sampleImagesList.length > 2) {
+                document.getElementById("selected-task").options[1].disabled = true;
+                document.getElementById("selected-task").options[2].disabled = true;
+                document.getElementById("selected-task").options[3].disabled = true;
+                document.getElementById("selected-task").options[4].disabled = true;
+                document.getElementById("selected-task").options[5].disabled = true;
+                document.getElementById("selected-task").options[6].disabled = true;
+                document.getElementById("selected-task").options[7].disabled = true;
+                document.getElementById("selected-task").options[8].disabled = false;
+            }
+        } else if (sampleImagesList.length == 2) {
+            document.getElementById("selected-task").options[1].disabled = true;
+            document.getElementById("selected-task").options[2].disabled = true;
+            document.getElementById("selected-task").options[3].disabled = true;
+            document.getElementById("selected-task").options[4].disabled = true;
+            document.getElementById("selected-task").options[5].disabled = true;
+            document.getElementById("selected-task").options[6].disabled = true;
+            document.getElementById("selected-task").options[7].disabled = false;
+            document.getElementById("selected-task").options[8].disabled = true;
+        } else {
+            console.log("I'm in else");
+            removed_image = sampleImagesList.splice(0, 1);
+            removed_image_list = removed_image[0].split("/")
+            removed_image_id = removed_image_list[removed_image_list.length - 1];
+            document.getElementById(removed_image_id).style.border = "";
+            sampleImagesList.push(imagePath);
+            document.getElementById(imageId).style.border = "3px solid red";
+        }
+
+        console.log("Sample Image list Final", sampleImagesList);
+        /*if (sampleImagesList.length > 1) {
+            removed_image = sampleImagesList.splice(0, 1);
+            removed_image_list = removed_image[0].split("/")
+            removed_image_id = removed_image_list[removed_image_list.length - 1];
+            document.getElementById(removed_image_id).style.border="";
+        }*/
+        // console.log("Sample Image list", sampleImagesList);
+    }
+
+    function clearSubmittedImagesList() {
+        for (i = 0; i < sampleImagesList.length; i++) {
+            removed_image_list = sampleImagesList[i].split("/")
+            removed_image_id = removed_image_list[removed_image_list.length - 1];
+            document.getElementById(removed_image_id).style.border = "";
+        }
+        document.getElementById("fileupload").disabled = false;
+        $('#fileupload').fileupload('enable');
+        $("#ResultDiv").hide();
+        $("#task-description-data-div").hide();
+        $("#question").val("");
+        $("#selected-task").val("");
+        $("#question").attr("placeholder", "Input Field").val("").focus().blur();
+        sampleImagesList = [];
+        console.log("cleared submitted images list", sampleImagesList);
+        scrollToElement($("#try-vilbert-on-your-images"));
+    }
+    function getSubmittedImagesList() {
+        return sampleImagesList;
+    }
+
+    var job_id = null;
+    var getLocation = function (href) {
+        var l = document.createElement("a");
+        l.href = href;
+        return l;
+    };
+    function submitUploadedImage(srcList) {
+        $("#question").prop("disabled", false);
+        $("#selected-task").prop("disabled", false);
+        console.log("Images List", srcList);
+        scrollToElement($("#termstart"));
+        scrollToElement($("#resultHeading"));
+        // src will be a list of image paths
+        if (srcList.length == 1) {
+            $("#demoType").val("demoImageType");
+            $("#show-grad-cam-result").hide();
+            $("#question").val("");
+            var img_path = getLocation(srcList[0]).pathname;
+            $("#inputImageAfterUpload").attr('src', img_path);
+            $("#inputImageAfterUpload").css('height', "300px");
+            $("#inputImageAfterUpload").css("width", "auto");
+            $("#two-images-div").hide();
+            $("#four-images-div").hide();
+            $("#ResultDiv").show();
+            $("#one-image-div").show();
+            $('#comments').prepend('<br>');
+            $('#comments').prepend('<li>' + "Submitted demo image" + '</li>');
+            // scrollToElement($("#termstart"));
+            // scrollToElement($("#resultHeading"));
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = false;
+            document.getElementById("selected-task").options[2].disabled = false;
+            document.getElementById("selected-task").options[3].disabled = false;
+            document.getElementById("selected-task").options[4].disabled = false;
+            document.getElementById("selected-task").options[5].disabled = false;
+            document.getElementById("selected-task").options[6].disabled = false;
+            document.getElementById("selected-task").options[7].disabled = true;
+            document.getElementById("selected-task").options[8].disabled = true;
+        }
+        if (srcList.length == 2) {
+            $("#show-grad-cam-result").hide();
+            var img_path_1 = getLocation(srcList[0]).pathname;
+            var img_path_2 = getLocation(srcList[1]).pathname;
+            $("#inputImageAfterUpload_1").attr('src', img_path_1);
+            $("#inputImageAfterUpload_2").attr('src', img_path_2);
+            $("#one-image-div").hide();
+            $("#four-images-div").hide();
+            $("#ResultDiv").show();
+            $("#two-images-div").show();
+            $('#comments').prepend('<br>');
+            // $('#comments').prepend('<li>' + "Submitted demo images" + '</li>');
+            // scrollToElement($("#termstart"));
+            // scrollToElement($("#resultHeading"));
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = true;
+            document.getElementById("selected-task").options[2].disabled = true;
+            document.getElementById("selected-task").options[3].disabled = true;
+            document.getElementById("selected-task").options[4].disabled = true;
+            document.getElementById("selected-task").options[5].disabled = true;
+            document.getElementById("selected-task").options[6].disabled = true;
+            document.getElementById("selected-task").options[7].disabled = false;
+            document.getElementById("selected-task").options[8].disabled = false;
+        }
+        if (srcList.length >= 2) {
+            $("#show-grad-cam-result").hide();
+            $("#show-refer-expressions-task-result").hide();
+            var img_path_1 = getLocation(srcList[0]).pathname;
+            var img_path_2 = getLocation(srcList[1]).pathname;
+            var img_path_3 = getLocation(srcList[2]).pathname;
+            var img_path_4 = getLocation(srcList[3]).pathname;
+            console.log(img_path_1, img_path_2, img_path_3, img_path_4);
+            if (img_path_1 != "/undefined") {
+                console.log("I'm in if 1");
+                $("#inputImageAfterUpload_14").attr('src', img_path_1);
+                $("#inputImageAfterUpload_14").show();
+            } else {
+                $("#inputImageAfterUpload_14").hide();
+                $("#inputImageAfterUpload_14").attr('src', "/");
+            }
+            if (img_path_2 != "/undefined") {
+                console.log("I'm in if 2");
+                $("#inputImageAfterUpload_24").attr('src', img_path_2);
+                $("#inputImageAfterUpload_24").show();
+            } else {
+                $("#inputImageAfterUpload_24").hide();
+                $("#inputImageAfterUpload_24").attr('src', "/");
+            }
+            if (img_path_3 != "/undefined") {
+                console.log("I'm in if 3");
+                $("#inputImageAfterUpload_34").attr('src', img_path_3);
+                $("#inputImageAfterUpload_34").show();
+            } else {
+                $("#inputImageAfterUpload_34").hide();
+                $("#inputImageAfterUpload_34").attr('src', "/");
+            }
+            if (img_path_4 == "/undefined") {
+                console.log("I'm in 4")
+                $("#inputImageAfterUpload_44").hide();
+            } else {
+                console.log("I'm in 4 else")
+                $("#inputImageAfterUpload_44").attr('src', img_path_4);
+                $("#inputImageAfterUpload_44").show();
+            }
+            $("#one-image-div").hide();
+            $("#two-images-div").hide();
+            $("#four-images-div").show();
+            $("#ResultDiv").show();
+            $('#comments').prepend('<br>');
+            $('#comments').prepend('<li>' + "Submitted demo images" + '</li>');
+            // scrollToElement($("#termstart"));
+            // scrollToElement($("#resultHeading"));
+            console.log(sampleImagesList);
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = true;
+            document.getElementById("selected-task").options[2].disabled = true;
+            document.getElementById("selected-task").options[3].disabled = true;
+            document.getElementById("selected-task").options[4].disabled = true;
+            document.getElementById("selected-task").options[5].disabled = true;
+            document.getElementById("selected-task").options[6].disabled = true;
+            if (srcList.length > 2) {
+                document.getElementById("selected-task").options[7].disabled = true;
+            } else {
+                document.getElementById("selected-task").options[7].disabled = false;
+            }
+            document.getElementById("selected-task").options[8].disabled = false;
+        }
+        // Handle the case with multiple images selection
+    }
+    function submitDemoImage(srcList) {
+        $("#question").prop("disabled", false);
+        $("#selected-task").prop("disabled", false);
+        console.log("Images List", srcList);
+        scrollToElement($("#termstart"));
+        scrollToElement($("#resultHeading"));
+        // src will be a list of image paths
+        if (srcList.length == 1) {
+            removed_image_list = srcList[0].split("/")
+            removed_image_id = removed_image_list[removed_image_list.length - 1];
+            document.getElementById(removed_image_id).style.border = "";
+            $("#demoType").val("demoImageType");
+            $("#show-grad-cam-result").hide();
+            $("#question").val("");
+            var img_path = getLocation(srcList[0]).pathname;
+            $("#inputImageAfterUpload").attr('src', img_path);
+            $("#inputImageAfterUpload").css('height', "300px");
+            $("#inputImageAfterUpload").css("width", "auto");
+            $("#two-images-div").hide();
+            $("#four-images-div").hide();
+            $("#ResultDiv").show();
+            $("#one-image-div").show();
+            $('#comments').prepend('<br>');
+            $('#comments').prepend('<li>' + "Submitted demo image" + '</li>');
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = false;
+            document.getElementById("selected-task").options[2].disabled = false;
+            document.getElementById("selected-task").options[3].disabled = false;
+            document.getElementById("selected-task").options[4].disabled = false;
+            document.getElementById("selected-task").options[5].disabled = false;
+            document.getElementById("selected-task").options[6].disabled = false;
+            document.getElementById("selected-task").options[7].disabled = true;
+            document.getElementById("selected-task").options[8].disabled = true;
+        }
+        if (srcList.length == 2) {
+            for (i = 0; i < srcList.length; i++) {
+                removed_image_list = srcList[i].split("/")
+                removed_image_id = removed_image_list[removed_image_list.length - 1];
+                document.getElementById(removed_image_id).style.border = "";
+            }
+            $("#show-grad-cam-result").hide();
+            var img_path_1 = getLocation(srcList[0]).pathname;
+            var img_path_2 = getLocation(srcList[1]).pathname;
+            $("#inputImageAfterUpload_1").attr('src', img_path_1);
+            $("#inputImageAfterUpload_2").attr('src', img_path_2);
+            $("#one-image-div").hide();
+            $("#four-images-div").hide();
+            $("#ResultDiv").show();
+            $("#two-images-div").show();
+            $('#comments').prepend('<br>');
+            // $('#comments').prepend('<li>' + "Submitted demo images" + '</li>');
+            // scrollToElement($("#termstart"));
+            // scrollToElement($("#resultHeading"));
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = true;
+            document.getElementById("selected-task").options[2].disabled = true;
+            document.getElementById("selected-task").options[3].disabled = true;
+            document.getElementById("selected-task").options[4].disabled = true;
+            document.getElementById("selected-task").options[5].disabled = true;
+            document.getElementById("selected-task").options[6].disabled = true;
+            document.getElementById("selected-task").options[7].disabled = false;
+            document.getElementById("selected-task").options[8].disabled = false;
+        }
+        if (srcList.length >= 2) {
+            for (i = 0; i < srcList.length; i++) {
+                removed_image_list = srcList[i].split("/")
+                removed_image_id = removed_image_list[removed_image_list.length - 1];
+                document.getElementById(removed_image_id).style.border = "";
+            }
+            $("#show-grad-cam-result").hide();
+            $("#show-refer-expressions-task-result").hide();
+            var img_path_1 = getLocation(srcList[0]).pathname;
+            var img_path_2 = getLocation(srcList[1]).pathname;
+            var img_path_3 = getLocation(srcList[2]).pathname;
+            var img_path_4 = getLocation(srcList[3]).pathname;
+            console.log(img_path_1, img_path_2, img_path_3, img_path_4);
+            if (img_path_1 != "/undefined") {
+                console.log("I'm in if 1");
+                $("#inputImageAfterUpload_14").attr('src', img_path_1);
+                $("#inputImageAfterUpload_14").show();
+            } else {
+                $("#inputImageAfterUpload_14").hide();
+                $("#inputImageAfterUpload_14").attr('src', "/");
+            }
+            if (img_path_2 != "/undefined") {
+                console.log("I'm in if 2");
+                $("#inputImageAfterUpload_24").attr('src', img_path_2);
+                $("#inputImageAfterUpload_24").show();
+            } else {
+                $("#inputImageAfterUpload_24").hide();
+                $("#inputImageAfterUpload_24").attr('src', "/");
+            }
+            if (img_path_3 != "/undefined") {
+                console.log("I'm in if 3");
+                $("#inputImageAfterUpload_34").attr('src', img_path_3);
+                $("#inputImageAfterUpload_34").show();
+            } else {
+                $("#inputImageAfterUpload_34").hide();
+                $("#inputImageAfterUpload_34").attr('src', "/");
+            }
+            if (img_path_4 == "/undefined") {
+                console.log("I'm in 4")
+                $("#inputImageAfterUpload_44").hide();
+            } else {
+                console.log("I'm in 4 else")
+                $("#inputImageAfterUpload_44").attr('src', img_path_4);
+                $("#inputImageAfterUpload_44").show();
+            }
+            $("#one-image-div").hide();
+            $("#two-images-div").hide();
+            $("#four-images-div").show();
+            $("#ResultDiv").show();
+            $('#comments').prepend('<br>');
+            $('#comments').prepend('<li>' + "Submitted demo images" + '</li>');
+            // scrollToElement($("#termstart"));
+            // scrollToElement($("#resultHeading"));
+            console.log(sampleImagesList);
+            sampleImagesList = [];
+            document.getElementById("selected-task").options[1].disabled = true;
+            document.getElementById("selected-task").options[2].disabled = true;
+            document.getElementById("selected-task").options[3].disabled = true;
+            document.getElementById("selected-task").options[4].disabled = true;
+            document.getElementById("selected-task").options[5].disabled = true;
+            document.getElementById("selected-task").options[6].disabled = true;
+            if (srcList.length > 2) {
+                document.getElementById("selected-task").options[7].disabled = true;
+            } else {
+                document.getElementById("selected-task").options[7].disabled = false;
+            }
+            document.getElementById("selected-task").options[8].disabled = false;
+        }
+        // Handle the case with multiple images selection
+    }
+    function submitImageForMultitask() {
+        $("#show-grad-cam-result").hide();
+        $("#show-refer-expressions-task-result").hide();
+        var question = $("#question").val();
+        var task_id = $("#selected-task").val();
+        console.log("Task ID, Question", task_id, question);
+        if (task_id == "16") {
+            var re = /^(Q:[a-z\d\-_\s]+\?\sA:[a-z\d\-_\s]+)$/;
+            test_question = question.split(",");
+            console.log(test_question);
+            for (i = 0; i < test_question.length; i++) {
+                if (re.test(test_question[i].trim())) {
+                    console.log(test_question[i]);
+                    console.log("Valid input to GuessWhat task");
+                } else {
+                    console.log(test_question[i]);
+                    console.log("Invalid input to GuessWhat task");
+                    alert("The input " + test_question[i] + " to the task is wrong. Please enter in below format. \r\nQ: 1st question? A: 1st answer, Q: 2nd question? A: 2nd answer, ... \r\n E.g. Q: is it white? A: no, Q: is it red? A: yes, Q: is it shiny? A: yes");
+                    return
+                }
+            }
+            question = question.replace(",", "");
+        }
+        if (task_id == "1" || task_id == "15" || task_id == "2" || task_id == "13" || task_id == "4" || task_id == "16" || task_id == "11") {
+            var selected_image_list = [];
+            var l = $("#inputImageAfterUpload")[0].src;
+            var img_path = getLocation(l).pathname;
+            selected_image_list.push(img_path);
+            console.log("selected_images_to_be_sent for 1 image Task", selected_image_list);
+            console.log("The input to task to be sent is", question);
+        } else if (task_id == "12") {
+            console.log("I'm in task 12");
+            var selected_image_list = [];
+            var l_1 = $("#inputImageAfterUpload_1")[0].src;
+            var img_path_1 = getLocation(l_1).pathname;
+            var l_2 = $("#inputImageAfterUpload_2")[0].src;
+            var img_path_2 = getLocation(l_2).pathname;
+            selected_image_list.push(img_path_1);
+            selected_image_list.push(img_path_2);
+            console.log("Selected Images to be sent for 2 images task", selected_image_list);
+            console.log("The input to task to be sent is", question);
+        } else if (task_id == null) {
+            alert("The number selected images and task type doesn't match. Please select the appropriate task type from the dropdown.");
+            return
+        } else if (task_id == "7") {
+            var selected_image_list = [];
+            var l_1 = $("#inputImageAfterUpload_14")[0].src;
+            var img_path_1 = getLocation(l_1).pathname;
+            console.log(img_path_1);
+            if (img_path_1 != "/") {
+                selected_image_list.push(img_path_1);
+            }
+            var l_2 = $("#inputImageAfterUpload_24")[0].src;
+            var img_path_2 = getLocation(l_2).pathname;
+            if (img_path_2 != "/") {
+                selected_image_list.push(img_path_2);
+            }
+            var l_3 = $("#inputImageAfterUpload_34")[0].src;
+            var img_path_3 = getLocation(l_3).pathname;
+            if (img_path_3 != "/") {
+                selected_image_list.push(img_path_3);
+            }
+            var l_4 = $("#inputImageAfterUpload_44")[0].src;
+            var img_path_4 = getLocation(l_4).pathname;
+            if (img_path_4 != "/") {
+                selected_image_list.push(img_path_4);
+            }
+            console.log("Selected Images to be sent for >=2 images task", selected_image_list);
+            console.log("The input to task to be sent is", question);
+        }
+        $.ajax({
+            type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+            url: "{% url 'demo:vilbert_multitask'%}", // the url where we want to POST
+            data: {
+                'image_list[]': selected_image_list,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'question': question,
+                'socket_id': "{{socketid}}",
+                'task_id': task_id
+            } // our data object
+        }).done(function (response) {
+            sampleImagesList = [];
+            selected_image_list = [];
+            console.log("Sample Images List after submitting images", sampleImagesList)
+            console.log("Ajax call completed successfully.")
+        });
+    }
+</script>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                data-target=".navbar-fixed-top .navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand fs-14" target="_blank"
+                href="https://cloudcv.org">CloudCV</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a target="_blank"
+                        href="https://evalai.cloudcv.org">EvalAI</a></li>
+                <li>
+                    <a target="_blank"
+                        href="https://github.com/Cloud-CV/Origami">Origami</a>
+                </li>
+                <li><a target="_blank"
+                        href="https://github.com/Cloud-CV/Fabrik">Fabrik</a>
+                </li>
+                <li><a target="_blank" href="http://gsoc.cloudcv.org">GSoC</a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                        role="button" aria-haspopup="true"
+                        aria-expanded="false">Demos <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="http://visualchatbot.cloudcv.org"
+                                target="_blank">Visual Chatbot</a>
+                        </li>
+                        <li><a href="http://vqa.cloudcv.org"
+                                target="_blank">VQA</a></li>
+                        <li>
+                            <a href="http://gradcam.cloudcv.org"
+                                target="_blank">Grad-CAM</a>
+                        </li>
+                        <li><a href="http://dbs.cloudcv.org"
+                                target="_blank">Diverse Beam Search</a></li>
+                        <li><a href="http://lemotif.cloudcv.org"
+                                target="_blank">Lemotif</a></li>
+                        <li><a href="http://doodle.cloudcv.org"
+                                target="_blank">Doodle</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<a style="position: fixed; top: 0; right: 0; border: 0; z-index:2000;"
+    target="_blank"
+    href="https://github.com/RishabhJain2018/vilbert-multitask-demo"><img
+        width="149" height="149"
+        src="https://github.blog/wp-content/uploads/2008/12/forkme_right_green_007200.png?resize=149%2C149"
+        class="attachment-full size-full" alt="Fork me on GitHub"
+        data-recalc-dims="1" /></a>

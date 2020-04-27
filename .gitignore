@@ -1,0 +1,8 @@
+*/.vscode/*
+media/*
+*.pyc
+env/
+db.sqlite3
+uwsgi.ini
+vilbert_multitask_nginx.conf
+static/

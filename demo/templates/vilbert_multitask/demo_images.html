@@ -1,0 +1,147 @@
+{%load static%}
+<style>
+.bar {
+    height: 18px;
+    background: green;
+}
+</style>
+<div class="container" id="try-vilbert-on-your-images">
+    <div class="page-header">
+        <h2>Try ViLBERT Multi-Task on sample images</h2>
+        <div class="row">
+            <div class="col-md-8 col-xs-12">
+                <!-- <div class="fs-16">Click on one of these images to send it to our servers (Or <a class="button_link"
+                        onclick="scrollToElement($('#userImages'))">upload</a> your own
+                    images below)</div> -->
+                    <div class="fs-16">
+                        Select one or more images to send to our servers. Most tasks require one image. 
+                        If you're interested in matching a caption to a pair of images (e.g., <a href="https://arxiv.org/pdf/1811.00491.pdf" target="_blank">NLVR2</a>), select 2 images. For image retrieval, select 2 to 4 images. You can also <a href="#upload-own-image">upload</a> your own images in JPG or PNG format.
+                    </div>
+            </div>
+            <div id="show-demo-images-btn" class="col-md-4">
+                <button class="btn btn-info demo-images">Show Demo Images</button>
+            </div>
+        </div>
+        <div class="row hiddenDiv demoImages" id="demoImages1">
+            <img src="/static/images/img1.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img1.jpg">
+            <img src="/static/images/img2.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img2.jpg">
+            <img src="/static/images/img3.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img3.jpg">
+        </div>
+        <div class="row hiddenDiv demoImages" id="demoImages2">
+            <img src="/static/images/img4.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img4.jpg">
+            <img src="/static/images/img5.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img5.jpg">
+            <img src="/static/images/img6.jpg" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="img6.jpg">
+            <br>
+        </div>
+        <div class="row randomImages" id="demoImages3">
+            <img src="{{ demo_images.0 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4 image-7" id="{{ images_name.0 }}">
+            <img src="{{ demo_images.1 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4 image-8" id="{{ images_name.1 }}">
+            <img src="{{ demo_images.2 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4 image-9" id="{{ images_name.2 }}">
+        </div>
+        <div class="row randomImages" id="demoImages4">
+            <img src="{{ demo_images.3 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="{{ images_name.3 }}">
+            <img src="{{ demo_images.4 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="{{ images_name.4 }}">
+            <img src="{{ demo_images.5 }}" onclick="addImagesToSampleList(this.id, this.src)" class="demo_img col-md-4" id="{{ images_name.5 }}">
+            <br>
+        </div>
+        Note: Nothing is pre-computed for these images. They are treated as a fresh upload
+        with every click.
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="center" style="text-align: center; font-size: 30px; font-weight: 300 !important;">
+                OR
+            </div>
+        </div>
+    </div>
+    <div class="row" id="upload-own-image">
+        <div class="col-md-5">
+            <h2>Upload your own images</h2>
+        </div>
+        <div class="col-md-3" style="margin-top: 3%;">
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="fileupload" type="file" name="files[]" data-url="{% url 'demo:upload_image' %}" accept="image/x-png, image/jpg, image/jpeg" multiple>
+                    <script>
+                        $(function () {
+                            console.log("I'm here");
+                            $('#fileupload').fileupload({
+                                dataType: 'json',
+                                limitMultiFileUploads: 4,
+                                singleFileUploads: false,
+                                send: function (e, data) {
+                                    console.log("I'm in send");
+                                    data.context = $('').val('')
+                                    .click(function () {
+                                        data.submit();
+                                    });
+                                    console.log("Data Files", data.files);
+                                    sampleImagesList = [];
+                                },
+                                progressall: function (e, data) {
+                                    $("#progress-bar-div").show();
+                                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                                    $('#progress .bar').css(
+                                        'width',
+                                        progress + '%'
+                                    );
+                                    $(".bar").html(progress + "%");
+                                },
+                                change: function(e, data) {
+                                    console.log("I'm in change");
+                                    if (data.files.length > 4){
+                                        alert("Only a maximum of 4 files are allowed!");
+                                        return false;
+                                    }
+                                    //$("#submit-images").css("disabled", true);
+                                    $("#ResultDiv").hide();
+                                    $("#task-description-data-div").hide();
+                                    $("#show-refer-expressions-task-result").hide();
+                                    $("#show-grad-cam-result").hide();
+                                    sampleImagesList = [];
+                                },
+                                done: function (e, data) {
+                                    // data.context.val('Upload finished');
+                                    var img_src = "https://vilbert.cloudcv.org";
+                                    console.log(data.result["file_paths"].length);
+                                    for (i=0; i < data.result["file_paths"].length; i++ ) {
+                                        var img_path = img_src + data.result["file_paths"][i];
+                                        console.log(img_path);
+                                        sampleImagesList.push(img_path)
+                                    }
+                                    $("#progress-bar-div").hide();
+                                    submitUploadedImage(sampleImagesList);
+                                    $("#question").val("");
+                                    $("#selected-task").val("");
+                                    $("#question").attr("placeholder", "Input Field").val("").focus().blur();
+                                    console.log("The result is", data);
+                                    console.log(sampleImagesList);
+                                    /*console.log(e, data);
+                                    console.log("Images to be uploaded list", images_to_be_uploaded_list);
+                                    console.log("Sample Images List", sampleImagesList);
+                                    if (images_to_be_uploaded_list.length == sampleImagesList.length) {
+                                        console.log("I can call submit function");
+
+                                    }*/
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" style="margin-top: 3%;" id="progress-bar-div">    
+            <div id="progress">
+                <div class="bar" style="width: 0%; text-align: center; color: white; font-weight: 300;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1" style="float: right;">
+            <input id="submit-images" type="button" value="Submit" onclick="submitDemoImage(getSubmittedImagesList())" class="btn btn-success">
+        </div>
+        <div class="col-md-1" style="float: right;">
+            <input id="clear-images" type="button" value="Clear" onclick="clearSubmittedImagesList()" class="btn btn-danger">
+        </div>
+    </div>
+</div>
