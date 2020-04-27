@@ -1,0 +1,158 @@
+p,
+h1,
+h2,
+h3,
+h4,
+font {
+    font-weight: 300 !important;
+    font-family: 'Roboto', sans-serif !important;
+}
+
+body {
+    font-weight: 300 !important;
+    font-family: 'Roboto', sans-serif !important;
+    padding-top: 30px;
+}
+
+.fs-16 {
+    font-size: 16px;
+}
+.fs-14 {
+    font-size: 14px !important;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.caption {
+    font-size: 18px !important;
+    font-weight: bold;
+}
+
+#inputAnswer,
+#predictedAnswer {
+    font-weight: bold;
+}
+
+.under {
+    position: absolute;
+    z-index: -1;
+}
+
+.over {
+    position: absolute;
+    z-index: 0;
+    mix-blend-mode: multiply;
+}
+
+#gradCamCaption {
+    position: relative;
+    padding-top: 350px;
+}
+
+.finalImages {
+    width: 350px !important;
+    height: 350px !important;
+    padding: 6px;
+}
+
+.resultText {
+    margin-bottom: 15px !important;
+}
+
+.vqa_model {
+    padding-bottom: 9px;
+    margin: 40px 0 20px;
+}
+
+.hiddenDiv {
+    display: none;
+}
+
+.button_link {
+    cursor: pointer;
+}
+
+.demo_img {
+    height: 300px !important;
+    padding: 6px;
+}
+
+.demo_img:hover {
+    border: 6px solid black;
+    padding: 0px;
+    cursor: pointer;
+}
+
+.image-selected {
+    border: 3px solid red !important;
+    padding: 0px;
+    cursor: pointer;
+}
+
+
+#show-demo-images-btn {
+    text-align: right;
+}
+
+@media(max-width: 540px) {
+    #show-demo-images-btn {
+        text-align: center;
+    }
+}
+
+.dz-upload {
+    display: block;
+    background-color: red;
+    height: 10px;
+    width: 0%;
+}
+
+input[type="radio"] {
+    vertical-align: super;
+    width: 5%;
+    height: 2%;
+    cursor: pointer;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #eee;
+}
+
+.choose-model {
+    padding-bottom: 9px;
+    border-bottom: 1px solid #eee;
+}
+
+.demo-images {
+    background-color: #428bca !important;
+    border-color: #357ebd !important;
+}
+
+.long-placeholder::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    white-space:pre-line;  
+    position:relative;
+    top:-7px;
+    
+}
+.long-placeholder::-moz-placeholder { /* Firefox 19+ */
+    white-space:pre-line;  
+    position:relative;
+    top:-7px;
+}
+.fs-20 {
+    font-size: 20px !important;
+}
+
+.fs-22 {
+    font-size: 22px !important;
+}
+
+.fs-24 {
+    font-size: 24px !important;
+}
+
+.fs-26 {
+    font-size: 26px !important;
+}

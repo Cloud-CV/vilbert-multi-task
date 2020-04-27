@@ -5,5 +5,4 @@ env/
 db.sqlite3
 uwsgi.ini
 vilbert_multitask_nginx.conf
-static/
 uwsgi_params
