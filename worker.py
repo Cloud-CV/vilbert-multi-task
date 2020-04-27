@@ -543,12 +543,6 @@ def callback(ch, method, properties, body):
     print("I'm callback")
     start = time.time()
     body = yaml.safe_load(body) # using yaml instead of json.loads since that unicodes the string in value
-    # body = {'socket_id': '4109f410-cee7-40d7-aa3b-ff7370f6c537',
-    #         'question': 'asd',
-    #         'image_path': ['/home/rjain321/demos/vilbert-miltitask-demo/vilbert_multitask/media/demo/b4497495-d5e9-44e6-8f79-776193ae068d.png',
-    #                        '/home/rjain321/demos/vilbert-miltitask-demo/vilbert_multitask/media/demo/6a029649-d40a-4ff4-b4b2-087d6360ef34.png'
-    #                        ],
-    #         'task_id': '7'}
     print(" [x] Received %r" % body)
     try:
         task = Tasks.objects.get(unique_id=int(body["task_id"]))
@@ -600,10 +594,6 @@ def callback(ch, method, properties, body):
             for i, j in zip(answer, color_list):            
                 image_obj = cv2.imread(image_path[0])
                 image_name = uuid.uuid4()
-                # img = Image.open(image_path[0])
-                # img = img.crop((i["x1"], i["y1"], i["x2"], i["y2"]))
-                # image_absolute_path = os.path.join(abs_path, "refer_expressions_task", str(image_name)+".jpg")
-                # img.save(image_absolute_path, "JPEG")
                 image_with_bounding_boxes = cv2.rectangle(image_obj, (i["x1"], i["y1"]), (i["x2"], i["y2"]), j, 4)
                 image_name_list.append(str(image_name))
                 confidence_list.append(round(i["confidence"], 2))
@@ -669,7 +659,7 @@ def callback(ch, method, properties, body):
 
 
 def main():
-    # Load correponding VQA model into global instance
+    # Load correponding Vilbert model into global instance
     load_vilbert_model()
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         host='localhost',
