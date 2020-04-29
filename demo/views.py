@@ -1,7 +1,4 @@
-# from rest_framework.decorators import api_view
 from django.http import JsonResponse
-# from rest_framework.response import Response
-# from rest_framework import status
 from channels import Group
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +12,6 @@ import uuid
 import os
 import random
 import traceback
-# import urllib2
 import demo.constants as constants
 
 COCO_PARTIAL_IMAGE_NAME = constants.COCO_PARTIAL_IMAGE_NAME
@@ -32,16 +28,8 @@ def vilbert_multitask(request, template_name="index.html"):
             input_images_list = request.POST.getlist("image_list[]")
             print(input_images_list, input_question, task_id)
             abs_image_path = []
-            # if len(input_images_list) == 1:
-            #     abs_image_path.append(str(os.path.join(settings.BASE_DIR, str(input_images_list[0][1:]))))
-            #     print("Absoulte image path", abs_image_path)
-            # elif len(input_images_list) == 2:
-            #     for i in range(len(input_images_list)):
-            #         abs_image_path.append(str(os.path.join(settings.BASE_DIR, str(input_images_list[i][1:]))))
-            # else:
             for i in range(len(input_images_list)):
                 abs_image_path.append(str(os.path.join(settings.BASE_DIR, str(input_images_list[i][1:]))))
-            # out_dir = os.path.dirname(abs_image_path)
             print(socketid, task_id, input_question, abs_image_path)
             # Run the Model wrapper
             log_to_terminal(socketid, {"terminal": "Starting Vilbert Multitask Job..."})
@@ -105,11 +93,6 @@ def file_upload(request):
         print("Image", images)
         socketid = request.POST.get('socketid')
         dir_type = constants.VILBERT_MULTITASK_CONFIG['image_dir']
-
-        # folder_uuid = uuid.uuid4()
-        # output_dir = os.path.join(dir_type, str(folder_uuid))
-        # if not os.path.exists(output_dir):
-        #     os.makedirs(output_dir)
         file_paths = []
         for i in images:
             image_uuid = uuid.uuid4()
