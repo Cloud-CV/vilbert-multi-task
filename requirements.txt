@@ -34,7 +34,7 @@ Markdown==3.2.1
 MarkupPy==1.14
 msgpack==0.6.2
 msgpack-python==0.4.8
-nltk==3.4.1
+nltk==3.4.5
 numpy==1.18.2
 odfpy==1.4.1
 openpyxl==3.0.3
